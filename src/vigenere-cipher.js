@@ -19,17 +19,80 @@ const { NotImplementedError } = require('../lib');
  * reverseMachine.decrypt('AEIHQX SX DLLU!', 'alphonse') => '!NWAD TA KCATTA'
  *
  */
-class VigenereCipheringMachine {
-  encrypt() {
-    // Remove line below and write your code here
-    throw new NotImplementedError('Not implemented');
+ class VigenereCipheringMachine {
+  constructor(direct = true) {
+    this.direct = direct;
   }
 
-  decrypt() {
-    // Remove line below and write your code here
-    throw new NotImplementedError('Not implemented');
+  encrypt(message, key) {
+    if (message === undefined || key === undefined) {
+      throw new Error('Incorrect arguments!');
+    }
+
+    const text = message.toUpperCase();
+    const keyword = key.toUpperCase();
+
+    let result = '';
+    let keyIndex = 0;
+
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      const charCode = char.charCodeAt(0);
+
+      if (charCode >= 65 && charCode <= 90) {
+        const messagePosition = charCode - 65;
+        const keyPosition =
+          keyword.charCodeAt(keyIndex % keyword.length) - 65;
+
+        const newPosition =
+          (messagePosition + keyPosition) % 26;
+
+        result += String.fromCharCode(newPosition + 65);
+
+        keyIndex++;
+      } else {
+        result += char;
+      }
+    }
+
+    return this.direct ? result : result.split('').reverse().join('');
+  }
+
+  decrypt(encryptedMessage, key) {
+    if (encryptedMessage === undefined || key === undefined) {
+      throw new Error('Incorrect arguments!');
+    }
+
+    const text = encryptedMessage.toUpperCase();
+    const keyword = key.toUpperCase();
+
+    let result = '';
+    let keyIndex = 0;
+
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      const charCode = char.charCodeAt(0);
+
+      if (charCode >= 65 && charCode <= 90) {
+        const messagePosition = charCode - 65;
+        const keyPosition =
+          keyword.charCodeAt(keyIndex % keyword.length) - 65;
+
+        const newPosition =
+          (messagePosition - keyPosition + 26) % 26;
+
+        result += String.fromCharCode(newPosition + 65);
+
+        keyIndex++;
+      } else {
+        result += char;
+      }
+    }
+
+    return this.direct ? result : result.split('').reverse().join('');
   }
 }
+
 
 module.exports = {
   directMachine: new VigenereCipheringMachine(),
